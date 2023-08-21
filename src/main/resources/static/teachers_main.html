@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teachers</title>
+    <link rel="stylesheet" href="stylebootstrap.css">
+    <script src="app.js"></script>
+    <script>
+        function getAllTeachers() {
+            var cavabGelenede = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(this.responseText);
+                    var teachers = response.data;
+                    var tblRows = document.getElementById("tblRows");
+                    // elementById.innerHTML = this.responseText; //bu hemin id-deki div-e girir
+                    var tblRow = document.getElementById("tblRow").innerHTML;
+                    tblRows.innerHTML = "";
+                    for (var i = 0; i < teachers.length; i++) {
+                        var teacher = teachers[i];
+                        var fillledTblRow = tblRow
+                            .replace(":name", teacher.name)
+                            .replace(":surname", teacher.surname)
+                            .replace(":university", teacher.universityId)
+                            .replace(":salary", teacher.salary)
+                            .replace(":id", teacher.id)
+                            .replace(":idForUpdate", teacher.id);
+                        tblRows.innerHTML += fillledTblRow;
+                    }
+                }
+            };
+            var name = document.getElementById("name").value;
+            var surname = document.getElementById("surname").value;
+            var salary = document.getElementById("salary").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = cavabGelenede;
+            xhttp.open("GET", "http://localhost:8080/teachers?name=" + name +
+                "&surname=" + surname +
+                "&salary=" + salary, true);
+            xhttp.send();
+        }
+
+        var selectedId;
+
+        function selectItem(id) {
+            this.selectedId = id;
+        }
+
+        function deleteItem() {
+            var cavabGelenede = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    getAllTeachers();
+                }
+            };
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = cavabGelenede;
+            xhttp.open("DELETE", "http://localhost:8080/teachers?id=" + selectedId, true);
+            xhttp.send();
+        }
+
+        function selectItemForUpdate(id) {
+            this.selectedId = id;
+            var cavabGelenede = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(this.responseText);
+                    var teacher = response.data;
+                    document.getElementById("nameUpdate").value = teacher.name;
+                    document.getElementById("surnameUpdate").value = teacher.surname;
+                    document.getElementById("salaryUpdate").value = teacher.salary;
+                    document.getElementById("universityUpdate").value = teacher.universityId;
+                }
+            };
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = cavabGelenede;
+            xhttp.open("GET", "http://localhost:8080/teachers/" + selectedId, true);
+            xhttp.send();
+        }
+        function updateItem() {
+            var cavabGelenede = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(this.responseText);
+                    var teacher = response.data;
+                    getAllTeachers();
+                }
+            };
+
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = cavabGelenede;
+                xhttp.open("PUT", "http://localhost:8080/teachers", true);
+                xhttp.setRequestHeader("Content-Type","application/json;charset=UTF-8");
+                xhttp.send(JSON.stringify({
+                        id: selectedId,
+                        name: document.getElementById("nameUpdate").value,
+                        surname: document.getElementById("surnameUpdate").value,
+                        salary: document.getElementById("salaryUpdate").value,
+                        universityId: document.getElementById("universityUpdate").value,
+                    }));
+        }
+    </script>
+</head>
+<body>
+
+
+<html>
+<head>
+    <title>TeacherPage</title>
+    <link rel="stylesheet" href="stylebootstrap.css">
+    <script src="app.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Dashboard</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" onclick="foo()">Home</a>
+                </li>
+                <li class="nav-item" onclick="foo()">
+                    <a class="nav-link" href="#">Teachers </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Students </a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <form class="d-flex" action="/webapp/logout.jsp">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">LOGOUT</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<h1>Teachers</h1>
+<div id="form" class="col-2 m-lg-3 ">
+    <div class="mb-3">
+        <label class="form-label" for="name">Name</label>
+        <input class="form-control" name="name" id="name" type="text">
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="surname">Surname</label>
+        <input class="form-control" name="surname" id="surname" type="text">
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="salary">Salary</label>
+        <input class="form-control" name="salary" id="salary" type="text">
+    </div>
+    <button class="btn btn-primary m-lg-3" onclick="getAllTeachers()">search</button>
+</div>
+
+
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Uni</th>
+            <th>Salary</th>
+            <th>actions</th>
+        </tr>
+        </thead>
+        <tbody id="tblRows">
+
+
+        </tbody>
+    </table>
+</div>
+<div style="display: none">
+    <table>
+        <tbody id="tblRow">
+        <tr>
+            <td>
+                :name
+            </td>
+            <td>
+                :surname
+            </td>
+            <td>
+                :university
+            </td>
+            <td>
+                :salary
+            </td>
+            <td>
+                <button class=" btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalDelete"
+                        onclick="selectItem(:id)">delete
+                </button>
+            </td>
+            <td>
+                <button class=" btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalUpdate"
+                        onclick="selectItemForUpdate(:idForUpdate)">update
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<!-- Delete Modal -->
+<div class="modal fade" id="modalDelete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="modalDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDeleteLabel">Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Do you want to delete?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="deleteItem()">Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Update Modal -->
+<div class="modal fade" id="modalUpdate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="modalUpdateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalUpdateLabel">Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="form" class="col-2 m-lg-3 ">
+                    <div class="mb-3">
+                        <label class="form-label" for="nameUpdate">Name</label>
+                        <input class="form-control" name="name" id="nameUpdate" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="surnameUpdate">Surname</label>
+                        <input class="form-control" name="surname" id="surnameUpdate" type="text">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="salaryUpdate">Salary</label>
+                        <input class="form-control" name="salary" id="salaryUpdate" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="universityUpdate">University</label>
+                        <input class="form-control" name="surname" id="universityUpdate" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="updateItem()">Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+</body>
+
+<script>
+    var btnTeachers = document.getElementById("btnTeachers");
+    btnTeachers.onclick = getAllTeachers();
+</script>
+</html>
